@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>마이페이지</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Apple SD Gothic Neo', sans-serif;
+      background-color: #f5f6f7;
+      color: black;
+      padding: 30px 20px;
+      margin: 0;
+      min-height: 100vh;
+    }
+    h1 {
+      color: black;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .profile-box {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin: 50px auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .form-row {
+      margin-bottom: 15px;
+    }
+    .form-row label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .form-row input {
+      width: 100%;
+      padding: 10px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .form-row input[readonly] {
+      background-color: #eee;
+    }
+    #saveBtn {
+      background-color: #ccd3ff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 4px;
+      width: 100%;
+      margin-top: 10px;
+    }
+    #profileImage {
+      display: block;
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid #ccd3ff;
+      margin: 10px auto;
+    }
+    #warningBox {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px dashed #999;
+      background-color: #fafafa;
+      text-align: center;
+    }
+  </style>
+</head>
+<body onload="loadUserInfo()">
+  <h1>마이페이지</h1>
+  <div class="profile-box">
+    <div class="form-row" style="text-align:center;">
+      <img id="profileImage" src="https://via.placeholder.com/120?text=사진" alt="프로필 사진">
+      <input type="file" id="imageUpload" accept="image/*" onchange="previewImage(event)">
+    </div>
+
+
+    <div class="form-row">
+      <label>이메일 (로그인 계정)</label>
+      <input type="email" id="userEmail" readonly>
+    </div>
+
+
+    <div class="form-row">
+      <label>이름</label>
+      <input type="text" id="userName" placeholder="이름을 입력하세요">
+    </div>
+
+
+    <div class="form-row">
+      <label>생년월일</label>
+      <input type="date" id="userBirth">
+    </div>
+
+
+    <div class="form-row">
+      <label>학번</label>
+      <input type="text" id="userStudentId" placeholder="예: 10101">
+    </div>
+
+
+    <div id="warningBox">
+      <strong>경고</strong> : 경고 내역 표시 영역입니다. (추후 기능 구현 예정)
+    </div>
+
+
+    <button id="saveBtn" onclick="saveProfile()">저장하기</button>
+  </div>
+
+
+  <script>
+    function loadUserInfo() {
+      const user = JSON.parse(localStorage.getItem("loggedInUser"));
+      if (!user) {
+        alert("로그인이 필요합니다.");
+        location.href = "index.html";
+        return;
+      }
+
+
+      document.getElementById("userEmail").value = user.email;
+
+
+      const profile = JSON.parse(localStorage.getItem("profile_" + user.id) || "{}");
+      if (profile.name) document.getElementById("userName").value = profile.name;
+      if (profile.birth) document.getElementById("userBirth").value = profile.birth;
+      if (profile.studentId) document.getElementById("userStudentId").value = profile.studentId;
+      if (profile.imageURL) document.getElementById("profileImage").src = profile.imageURL;
+    }
+
+
+    function saveProfile() {
+      const user = JSON.parse(localStorage.getItem("loggedInUser"));
+      const data = {
+        name: document.getElementById("userName").value,
+        birth: document.getElementById("userBirth").value,
+        studentId: document.getElementById("userStudentId").value,
+        imageURL: document.getElementById("profileImage").src
+      };
+      localStorage.setItem("profile_" + user.id, JSON.stringify(data));
+      alert("저장 완료!");
+    }
+
+
+    function previewImage(event) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        document.getElementById("profileImage").src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  </script>
+</body>
+</html>
+
